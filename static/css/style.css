@@ -1,0 +1,194 @@
+/* --- 1. 둥근모꼴 폰트 불러오기 --- */
+/* (static/css/ 폴더에 폰트 파일이 있다고 가정) */
+@font-face {
+  font-family: "DungGeunMo";
+  src: url("DungGeunMo.ttf") format("ttf");
+  font-weight: 400;
+}
+
+/* --- 2. 기본 스타일 (리셋) --- */
+body,
+html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  /* 둥근모꼴 폰트를 기본 폰트로 설정 */
+  font-family: "DungGeunMo", "Pretendard";
+  background-color: #f0f0f0; /* 배경 이미지 로딩 실패 시 보일 색상 */
+}
+
+/* [반응형 핵심] 
+  모든 콘텐츠를 감싸는 컨테이너입니다.
+  프로토타입처럼 모바일 화면(최대 464px)을 기준으로 만듭니다.
+*/
+.container {
+  /* 디자인 원본 크기(464px)를 최대 너비로 설정합니다.
+      이러면 PC에서 봐도 너무 커지지 않고 앱처럼 보입니다.
+    */
+  max-width: 464px;
+  min-height: 100vh; /* 화면 전체 높이 */
+  margin: 0 auto; /* PC에서 화면 중앙 정렬 */
+
+  /* 중요: 배경 이미지를 깔고, 그 위에 요소들을 배치하기 위해
+      position: relative 를 사용합니다.
+    */
+  position: relative;
+
+  /* Flexbox로 내부 아이템(시작 페이지 등)을 정렬합니다. */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* 세로 중앙 (컨텐츠가 적을 때) */
+  align-items: center; /* 가로 중앙 */
+
+  box-sizing: border-box;
+}
+
+/* --- 3. 시작 페이지 (start-page) - 수정됨 --- */
+
+/* .container의 기본 스타일은 그대로 둡니다.
+  (max-width: 464px, margin: 0 auto 등)
+  우리는 .container 안의 .start-page를 꾸밀 것입니다.
+*/
+
+.start-page {
+  width: 100%;
+  /* [중요] min-height를 사용합니다. 
+      이제 100vh로 강제로 줄이지 않고, 내용이 길어지면
+      이 .start-page 자체가 길어질 수 있습니다.
+    */
+  min-height: 100vh;
+
+  /* 피그마의 그라데이션 배경을 CSS로 구현 */
+  background: linear-gradient(to bottom, #24cde0 0%, #ffffff 42%);
+
+  /* [중요] 하단 고정 버튼 영역(fixed-button-container)이
+      기준으로 삼을 수 있도록 relative 속성을 줍니다.
+    */
+  position: relative;
+
+  /* 하단 버튼(약 100px)이 스크롤되는 콘텐츠의 맨 마지막 부분을
+      가리지 않도록, .start-page 자체에 미리 여백을 줍니다.
+    */
+  padding-bottom: 120px; /* 고정 버튼 높이 + 추가 여백 */
+  box-sizing: border-box;
+
+  /* 내부 요소들(h1, p, 이미지) 정렬 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* [ 1. 스크롤되는 콘텐츠 영역 ] */
+.scroll-content {
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+  padding-top: 60px; /* 상단 여백 */
+}
+
+/* 로고 */
+.scroll-content img {
+  max-width: 20%;
+  margin-bottom: 0px;
+}
+
+/* 제목 (퍼스널 쉼...) */
+.scroll-content h1 {
+  /* 피그마 값: color: white, font-size: 55px, text-shadow ... */
+  color: white;
+  font-size: 50px;
+  text-shadow: 0px 2px 7px rgba(0, 0, 0, 0.25);
+  margin-bottom: 20px;
+  line-height: 1.2;
+}
+
+/* 부제목 (나는 어떻게...) */
+.scroll-content p {
+  color: #072e33;
+  font-size: 17px;
+  margin: 0;
+  margin-bottom: 40px; /* 캐릭터들과의 간격 */
+}
+
+/* (예시) 캐릭터 이미지들을 담을 영역 */
+.character-zone {
+  width: 100%;
+}
+/* (예시) 캐릭터 이미지 개별 스타일 */
+.character-zone img {
+  max-width: 80%; /* 화면보다 커지지 않게 */
+  height: auto;
+  margin-bottom: 10px;
+}
+
+/* [ 2. 화면 하단에 고정되는 버튼 영역 ] */
+.fixed-button-container {
+  /* [핵심] position: fixed로 화면에 고정
+    */
+  position: fixed;
+  bottom: 0;
+  left: 50%; /* 가운데 정렬을 위해 */
+  transform: translateX(-50%); /* 가운데 정렬 */
+
+  width: 100%;
+  max-width: 464px; /* 부모 .container의 너비와 동일하게 */
+
+  /* [수정] 피그마 원본처럼 버튼 영역은 투명하게 만듭니다. */
+  background: transparent;
+
+  /* 버튼을 중앙에 배치하고 하단 여백을 줍니다 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 20px;
+  padding-bottom: 30px; /* 모바일 하단 영역 고려 */
+  padding-left: 20px;
+  padding-right: 20px;
+  box-sizing: border-box;
+
+  /* [수정] 컨테이너의 그림자 제거 */
+  box-shadow: none;
+}
+
+/* 시작 버튼 스타일 (피그마 Inner Shadow 적용) */
+.btn-start {
+    /* [수정] 피그마 디자인 값으로 변경 */
+    display: block;
+    
+    /* [수정] 피그마의 고정 너비/높이 적용 */
+    width: 324px;
+    height: 61px;
+    box-sizing: border-box; /* 패딩, 보더가 크기에 포함되도록 */
+
+    background: #F8F8F8; /* 버튼 배경색 */
+    color: black; /* 글자 색 */
+    font-family: "DungGeunMo";
+    font-size: 22px;
+    font-weight: 400;
+    text-decoration: none;
+    
+    border-radius: 20px;
+
+    /* [핵심] shadow */
+    box-shadow: inset 0px -5px 12px rgba(0, 0, 0, 0.25);
+
+    /* 텍스트("시작하기")를 버튼의 세로/가로 중앙에 정렬합니다. */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    /* (선택) 클릭 시 미세한 효과 */
+    transition: transform 0.1s ease;
+}
+
+.btn-start:active {
+    /* 버튼을 누르고 있을 때 살짝 작아지는 효과 */
+    transform: scale(0.98);
+}
+
+/*
+  [수정] 기존 .start-page .btn-start 스타일은
+  .fixed-button-container .btn-start 로 변경하거나
+  위의 스타일로 덮어써야 합니다.
+*/

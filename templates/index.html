@@ -1,0 +1,21 @@
+{% extends "layout.html" %} {% block content %}
+<main class="start-page">
+  <div class="scroll-content">
+    <img src="{{ url_for('static', filename='images/logo.png')}}" alt="">
+    <h1>퍼스널 쉼<br />유형 테스트</h1>
+    <p>나는 어떻게 쉬는 유형일까?</p>
+
+    <div class="character-zone">
+      <img src="{{ url_for('static', filename='images/char1.png') }}" />
+      <img src="{{ url_for('static', filename='images/char2.png') }}" />
+      <img src="{{ url_for('static', filename='images/char3.png') }}" />
+      <img src="{{ url_for('static', filename='images/char4.png') }}" />
+      <img src="{{ url_for('static', filename='images/char5.png') }}" />
+      <img src="{{ url_for('static', filename='images/char6.png') }}" />
+    </div>
+  </div>
+  <div class="fixed-button-container">
+    <a class="btn-start">시작하기</a>
+  </div>
+</main>
+{% endblock %}
