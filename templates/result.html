@@ -1,6 +1,4 @@
-{% extends "layout.html" %}
-
-{% block content %}
+{% extends "layout.html" %} {% block content %}
 <!-- ... (헤더 부분은 동일) ... -->
 <header class="page-header">
   <a href="{{ url_for('index') }}" class="logo-link">
@@ -13,29 +11,33 @@
 </header>
 
 <main class="result-page">
-    
-    <img src="{{ url_for('static', filename='images/' + data.image) }}" alt="{{ data.image }}" class="result-main-image">
+  <img
+    src="{{ url_for('static', filename='images/' + data.image) }}"
+    alt="{{ data.image }}"
+    class="result-main-image"
+  />
 
-    <!-- '유형 소개' 섹션 -->
-    <section class="type-description">
-        <h3>유형 소개</h3>
-        <p>{{ data.description | safe }}</p>
-    </section>
+  <!-- '유형 소개' 섹션 -->
+  <section class="type-description">
+    <h3>유형 소개</h3>
+    <p>{{ data.description | safe }}</p>
+  </section>
 
-    <!-- '공유하기' 섹션 -->
-    <section class="share-section">
-        <h3>테스트 공유하기</h3>
-        <div class="share-buttons">
-            <a href="#"><img src="{{ url_for('static', filename='images/insta.svg') }}" alt="인스타그램"></a>
-            <a href="#"><img src="{{ url_for('static', filename='images/x.svg') }}" alt="X"></a>
-            <a href="#"><img src="{{ url_for('static', filename='images/kakao.svg') }}" alt="카카오톡"></a>
-        </div>
-    </section>
-
-    <!-- '다시하기' 버튼 -->
-    <div class="restart-button-container">
-        <a href="{{ url_for('index') }}" class="btn-restart">테스트 다시하기</a>
+  <!-- '공유하기' 섹션 -->
+  <section class="share-section">
+    <h3>공유하기</h3>
+    <div class="share-buttons">
+      <a href="#"
+        ><img
+          src="{{ url_for('static', filename='images/linkcopy.svg') }}"
+          alt="링크복사"
+      /></a>
     </div>
-    
+  </section>
+
+  <!-- '다시하기' 버튼 -->
+  <div class="restart-button-container">
+    <a href="{{ url_for('index') }}" class="btn-restart">테스트 다시하기</a>
+  </div>
 </main>
 {% endblock %}
