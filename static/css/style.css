@@ -426,11 +426,6 @@ body {
 
 /* ===== 작은 화면 최적화 패치 ===== */
 
-/* 1) 제목/본문/버튼을 뷰포트에 맞춰 유연하게 */
-.scroll-content h1 {
-  font-size: clamp(28px, 8vw, 50px); /* SE에선 28~32px 근처 */
-}
-
 .question-text {
   font-size: clamp(18px, 5.2vw, 22px);
   /* 3줄 기준 최소 높이 재계산: 글자 줄이면 높이도 낮춤 */
@@ -441,37 +436,4 @@ body {
   font-size: clamp(14px, 4.2vw, 16px);
   padding: 16px;
   min-height: 96px; /* 115px → 96px */
-}
-
-/* 2) 진행점/상단 여백 축소 */
-.progress-bar { gap: 6px; margin-top: 12px; margin-bottom: 28px; }
-.progress-dot { width: 16px; height: 16px; }
-
-/* 3) 폭이 작을 때(예: SE3, 375px 이하) 추가 축소 */
-@media (max-width: 375px) {
-  .scroll-content { padding: 16px; }
-  .page-header { height: calc(52px + env(safe-area-inset-top)); }
-  .question-page,
-  .start-page .scroll-content,
-  .loading-page,
-  .result-page {
-    padding-top: calc(52px + env(safe-area-inset-top)); /* 헤더 낮춤과 일치 */
-  }
-  .btn-start { width: 300px; height: 56px; font-size: 20px; }
-  .options-container { max-width: 300px; }
-}
-
-/* 4) 세로가 짧을 때(상단바 펼쳐짐 등 포함) 추가로 여백 줄이기 */
-@media (max-height: 700px) {
-  .question-page { padding-bottom: 24px; }
-  .btn-option { min-height: 88px; padding: 14px; }
-  .type-description { margin-top: 28px; padding: 16px; }
-  .result-main-image { margin-top: 20px; }
-}
-
-/* 5) 아주 작은 세로(<=600px, 키보드/주소창 확장 시) */
-@media (max-height: 600px) {
-  .scroll-content h1 { font-size: clamp(24px, 7vw, 32px); }
-  .question-text { font-size: clamp(16px, 4.8vw, 20px); }
-  .btn-option { font-size: clamp(13px, 4vw, 15px); min-height: 80px; }
 }
