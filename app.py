@@ -6,16 +6,12 @@ app = Flask(__name__)
 app.secret_key = 'pause-test-secret-key' 
 
 # --- [대규모 수정] SQLAlchemy 설정 ---
-# 1. Render에서 제공하는 PostgreSQL 주소(DATABASE_URL)를 사용합니다.
-# 2. 만약 그 주소가 없으면(즉, 님의 Mac에서 로컬로 실행하면), 
-#    임시로 'sqlite:///local_test.db' 파일을 사용합니다.
 db_url = os.environ.get('DATABASE_URL')
 if db_url and db_url.startswith("postgres://"):
     # Render가 제공하는 주소 형식을 SQLAlchemy에 맞게 수정
     db_url = db_url.replace("postgres://", "postgresql://", 1)
 else:
-    # 로컬 테스트용 임시 DB
-    db_url = 'sqlite:///local_test.db'
+    print("DB error. No database url")
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False # 경고 메시지 제거
