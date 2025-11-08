@@ -1,12 +1,11 @@
 /* --- 1. 폰트 불러오기 --- */
 @font-face {
-  font-family: "DungGeunMo"; /* 원본 폰트명과 일치시켰습니다 */
+  font-family: "DungGeunMo";
   src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/DungGeunMo.woff")
     format("woff");
-  font-weight: normal; /* 400과 동일합니다 */
+  font-weight: normal;
   font-display: swap;
 }
-
 @font-face {
   font-family: "Pretendard";
   src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Regular.woff2")
@@ -14,7 +13,6 @@
   font-weight: 400;
   font-display: swap;
 }
-
 @font-face {
   font-family: "Pretendard";
   src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Medium.woff2")
@@ -22,7 +20,6 @@
   font-weight: 500;
   font-display: swap;
 }
-
 @font-face {
   font-family: "Pretendard";
   src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-SemiBold.woff2")
@@ -30,7 +27,6 @@
   font-weight: 600;
   font-display: swap;
 }
-
 @font-face {
   font-family: "Pretendard";
   src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Bold.woff2")
@@ -39,91 +35,79 @@
   font-display: swap;
 }
 
-/* --- 2. 기본 스타일 (리셋) --- */
-body,
-html {
+/* --- 2. 기본 스타일 (리셋/공통) --- */
+html,
+body {
+  height: 100%;
   margin: 0;
   padding: 0;
   width: 100%;
-  /* 둥근모꼴 폰트를 기본 폰트로 설정 */
   font-family: "DungGeunMo", "Pretendard";
-  background-color: #f0f0f0; /* 배경 이미지 로딩 실패 시 보일 색상 */
+  background-color: #f0f0f0;
+  overflow-x: hidden;
 }
 
-/* [반응형 핵심] 
-  모든 콘텐츠를 감싸는 컨테이너입니다.
-  프로토타입처럼 모바일 화면(최대 464px)을 기준으로 만듭니다.
-*/
 .container {
-  /* 디자인 원본 크기(464px)를 최대 너비로 설정합니다.
-      이러면 PC에서 봐도 너무 커지지 않고 앱처럼 보입니다.
-    */
   max-width: 464px;
-  min-height: 100vh; /* 화면 전체 높이 */
-  margin: 0 auto; /* PC에서 화면 중앙 정렬 */
-
-  /* 중요: 배경 이미지를 깔고, 그 위에 요소들을 배치하기 위해
-      position: relative 를 사용합니다.
-    */
+  min-height: 100dvh;
+  min-height: 100svh;
+  min-height: 100vh;
+  margin: 0 auto;
   position: relative;
-
-  /* Flexbox로 내부 아이템(시작 페이지 등)을 정렬합니다. */
   display: flex;
   flex-direction: column;
-  justify-content: center; /* 세로 중앙 (컨텐츠가 적을 때) */
-  align-items: center; /* 가로 중앙 */
-
+  justify-content: center;
+  align-items: center;
   box-sizing: border-box;
 }
 
-/* --- 3. 시작 페이지 (start-page) - 수정됨 --- */
-
-.start-page {
-  width: 100%;
-  /* [중요] min-height를 사용합니다. 
-      이제 100vh로 강제로 줄이지 않고, 내용이 길어지면
-      이 .start-page 자체가 길어질 수 있습니다.
-    */
+/* 페이지 공통 높이 기준 */
+.start-page,
+.question-page,
+.loading-page,
+.result-page {
+  min-height: 100dvh;
+  min-height: 100svh;
   min-height: 100vh;
-
-  /* 피그마의 그라데이션 배경을 CSS로 구현 */
-  background: linear-gradient(to bottom, #24cde0 0%, #ffffff 42%);
-
-  /* [중요] 하단 고정 버튼 영역(fixed-button-container)이
-      기준으로 삼을 수 있도록 relative 속성을 줍니다.
-    */
-  position: relative;
-
-  /* 하단 버튼(약 100px)이 스크롤되는 콘텐츠의 맨 마지막 부분을
-      가리지 않도록, .start-page 자체에 미리 여백을 줍니다.
-    */
-  padding-bottom: 120px; /* 고정 버튼 높이 + 추가 여백 */
   box-sizing: border-box;
+}
 
-  /* 내부 요소들(h1, p, 이미지) 정렬 */
+/* --- 3. 시작 페이지 --- */
+.start-page {
+  /* 피그마 그라디언트 */
+  background: linear-gradient(to bottom, #24cde0 0%, #ffffff 42%);
+  position: relative;
+  /* 하단 고정 버튼에 가리지 않도록 */
+  padding-bottom: calc(120px + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
 }
 
-/* [ 1. 스크롤되는 콘텐츠 영역 ] */
+/* 스크롤되는 콘텐츠 영역 */
 .scroll-content {
   width: 100%;
   padding: 20px;
   box-sizing: border-box;
-  padding-top: 60px; /* 상단 여백 */
+}
+
+/* 상단 헤더 높이만큼 페이지 상단 여백 부여 (안전영역 포함) */
+.question-page,
+.start-page .scroll-content,
+.loading-page,
+.result-page {
+  padding-top: calc(62px + env(safe-area-inset-top));
 }
 
 /* 로고 */
 .scroll-content .logo-main {
   max-width: 20%;
-  margin-bottom: 0px;
+  margin-bottom: 0;
 }
 
-/* 제목 (퍼스널 쉼...) */
+/* 제목 */
 .scroll-content h1 {
-  /* 피그마 값: color: white, font-size: 55px, text-shadow ... */
   color: white;
   font-size: 50px;
   text-shadow: 0px 2px 7px rgba(95, 95, 95, 0.17);
@@ -131,92 +115,67 @@ html {
   line-height: 1.2;
 }
 
-/* 부제목 (나는 어떻게...) */
+/* 부제목 */
 .scroll-content p {
   color: #072e33;
   font-size: 17px;
-  margin: 0;
-  margin-bottom: 40px; /* 캐릭터들과의 간격 */
+  margin: 0 0 40px 0;
 }
 
-/* (예시) 캐릭터 이미지들을 담을 영역 */
+/* 캐릭터 영역 */
 .character-zone {
   width: 100%;
 }
-/* (예시) 캐릭터 이미지 개별 스타일 */
 .character-zone img {
-  max-width: 80%; /* 화면보다 커지지 않게 */
+  max-width: 80%;
   height: auto;
   margin-bottom: 10px;
 }
 
-/* [ 2. 화면 하단에 고정되는 버튼 영역 ] */
+/* --- 4. 화면 하단 고정 버튼 --- */
 .fixed-button-container {
-  /* [핵심] position: fixed로 화면에 고정
-    */
   position: fixed;
-  bottom: 0;
-  left: 50%; /* 가운데 정렬을 위해 */
-  transform: translateX(-50%); /* 가운데 정렬 */
-
+  left: 50%;
+  transform: translateX(-50%);
   width: 100%;
-  max-width: 464px; /* 부모 .container의 너비와 동일하게 */
-
-  /* [수정] 피그마 원본처럼 버튼 영역은 투명하게 만듭니다. */
+  max-width: 464px;
+  bottom: env(safe-area-inset-bottom);
+  padding-bottom: calc(env(safe-area-inset-bottom) + 16px);
+  padding-top: 20px;
+  padding-left: 20px;
+  padding-right: 20px;
   background: transparent;
-
-  /* 버튼을 중앙에 배치하고 하단 여백을 줍니다 */
   display: flex;
   justify-content: center;
   align-items: center;
-  padding-top: 20px;
-  padding-bottom: 30px; /* 모바일 하단 영역 고려 */
-  padding-left: 20px;
-  padding-right: 20px;
   box-sizing: border-box;
-
-  /* [수정] 컨테이너의 그림자 제거 */
   box-shadow: none;
 }
 
-/* 시작 버튼 스타일 (피그마 Inner Shadow 적용) */
+/* 시작 버튼 */
 .btn-start {
-  /* [수정] 피그마 디자인 값으로 변경 */
   display: block;
-
-  /* [수정] 피그마의 고정 너비/높이 적용 */
   width: 324px;
   height: 61px;
-  box-sizing: border-box; /* 패딩, 보더가 크기에 포함되도록 */
-
-  background: #f8f8f8; /* 버튼 배경색 */
-  color: black; /* 글자 색 */
+  box-sizing: border-box;
+  background: #f8f8f8;
+  color: black;
   font-family: "DungGeunMo";
   font-size: 22px;
   font-weight: 400;
   text-decoration: none;
-
   border-radius: 20px;
-
-  /* [핵심] shadow */
   box-shadow: inset 0px -5px 12px rgba(0, 0, 0, 0.25);
-
-  /* 텍스트("시작하기")를 버튼의 세로/가로 중앙에 정렬합니다. */
   display: flex;
   justify-content: center;
   align-items: center;
-
-  /* (선택) 클릭 시 미세한 효과 */
   transition: transform 0.1s ease;
 }
-
 .btn-start:active {
-  /* 버튼을 누르고 있을 때 살짝 작아지는 효과 */
   transform: scale(0.98);
 }
 
-/* --- 4. 공통 페이지 헤더 (수정) --- */
-/* 피그마 디자인 적용: background: #7C7C7C, height: 62px */
+/* --- 5. 상단 고정 헤더 --- */
 .page-header {
   position: fixed;
   top: 0;
@@ -224,80 +183,61 @@ html {
   transform: translateX(-50%);
   width: 100%;
   max-width: 464px;
-
-  /* [수정] 피그마 값 */
-  height: 62px;
+  height: calc(62px + env(safe-area-inset-top));
+  padding-top: env(safe-area-inset-top);
   background-color: #7c7c7c;
-
+  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 15px;
   box-sizing: border-box;
-  z-index: 10;
 }
 
-/* [수정] 뒤로가기 링크(<a>) 스타일 */
+/* 뒤로가기 링크 */
 .page-header .back-link {
   position: absolute;
-  left: 20px; /* 왼쪽 여백 */
+  left: 20px;
   top: 50%;
   transform: translateY(-50%);
-
-  /* (중요) 이미지 크기를 여기서 제어합니다 */
-  width: 12px; /* 피그마의 9.5px 보다 조금 여유있게 */
-  height: 22px; /* 피그마의 19px 보다 조금 여유있게 */
-
-  /* SVG가 늘어나지 않게 */
+  width: 12px;
+  height: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-
-/* [신규] 뒤로가기 SVG 이미지(<img>) 스타일 */
 .page-header .back-link img {
   width: 100%;
   height: 100%;
 }
 
-/* [수정] 로고 이미지(<img>) 스타일 */
+/* 로고 이미지 */
 .page-header .logo-img {
-  /* 텍스트 로고(.logo) 대신 이미지(.logo-img) 사용 */
-  height: 25px; /* 로고 이미지의 높이 (비율에 맞게 조절) */
-  width: auto; /* 너비는 비율에 맞게 자동 조절 */
+  height: 25px;
+  width: auto;
 }
 
-/* --- 5. (신규) 질문 페이지 --- */
+/* --- 6. 질문 페이지 --- */
 .question-page {
   width: 100%;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-
-  /* [수정] 피그마 그라데이션 적용 */
   background: linear-gradient(180deg, white 37%, #24cde0 100%);
-
-  /* 상단 헤더(62px) 뒤에서 시작 + 추가 여백 */
-  padding-top: 80px;
   padding-bottom: 40px;
   padding-left: 20px;
   padding-right: 20px;
-  box-sizing: border-box;
 }
 
-/* --- (신규) 진행 상황 바 --- */
+/* 진행 상황 바 */
 .progress-bar {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 7px; /* 피그마 값 */
-  margin-top: 20px; /* 헤더와의 간격 */
-  margin-bottom: 40px; /* 질문과의 간격 */
+  gap: 7px;
+  margin-top: 20px;
+  margin-bottom: 40px;
 }
-
 .progress-dot {
-  /* [핵심] * 버블 사용  */
   width: 20px;
   height: 20px;
   display: flex;
@@ -305,7 +245,7 @@ html {
   align-items: center;
 }
 
-/* --- 질문 텍스트 --- */
+/* 질문 텍스트 */
 .question-text {
   color: black;
   font-size: 22px;
@@ -313,25 +253,20 @@ html {
   font-weight: 700;
   text-align: center;
   margin-bottom: 40px;
-  line-height: 1.5; /* 줄 간격 */
-
-  /* [수정] 
-    - 3줄일 때의 높이(22px * 1.5 * 3 = 99px)를 최소 높이로 고정합니다.
-    - 2줄짜리 텍스트도 이 99px 공간 안에서 세로 중앙에 정렬됩니다.
-  */
-  min-height: 99px;
+  line-height: 1.5;
+  min-height: 99px; /* 22 * 1.5 * 3줄 */
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* --- (신규) 답변 버튼 컨테이너 --- */
+/* 답변 버튼 컨테이너 */
 .options-container {
   width: 100%;
-  max-width: 320px; /* 피그마 버튼 너비(301px) + 여유 */
+  max-width: 320px;
 }
 
-/* --- (수정) 답변 버튼 (Request 1) --- */
+/* 답변 버튼 */
 .btn-option {
   display: block;
   width: 100%;
@@ -348,105 +283,57 @@ html {
   line-height: 1.5;
   box-sizing: border-box;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-
-  /* [수정] Request 1: 버튼 크기 고정  */
-  padding: 20px; /* 좌우 패딩은 유지 */
-  min-height: 115px; /* (3줄 텍스트가 들어갈 수 있는 최소 높이. 픽셀 값 조절 필요) */
-  display: flex; /* Flexbox로 변경 */
-  justify-content: center; /* 가로 중앙 */
-  align-items: center; /* 세로 중앙 */
+  padding: 20px;
+  min-height: 115px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
-
 .btn-option:hover {
-  transform: scale(1.03); /* 살짝 커지는 효과 */
+  transform: scale(1.03);
 }
 
-/* --- 6. (신규) 로딩 페이지 --- */
+/* --- 7. 로딩 페이지 --- */
 .loading-page {
   width: 100%;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center; /* 세로 중앙 정렬 */
+  justify-content: center;
   background: linear-gradient(180deg, white 37%, #24cde0 100%);
-  padding-top: 62px;
+  padding-top: calc(62px + env(safe-area-inset-top));
   box-sizing: border-box;
 }
 .loading-content {
   text-align: center;
 }
 .loading-content p {
-  font-family: "DungGeunMo"; /* 둥근모꼴 적용 */
+  font-family: "DungGeunMo";
   font-size: 1.5em;
   color: #333;
 }
 
-/* --- 유형 소개 섹션 (Request 3.2 디자인) --- */
-.type-description {
-  width: 90%;
-  max-width: 400px;
-  margin-top: 40px;
-  text-align: center;
-
-  /* 피그마의 '흰색 카드' 디자인 적용 */
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-  box-sizing: border-box;
-}
-.type-description h3 {
-  /* 피그마 스타일 적용 */
-  color: black;
-  font-size: 18px;
-  font-family: "Pretendard";
-  font-weight: 700;
-  margin-top: 0;
-  margin-bottom: 15px;
-}
-.type-description p {
-  /* 피그마 스타일 적용 */
-  color: black;
-  font-size: 15px;
-  font-family: "Pretendard";
-  font-weight: 500;
-  line-height: 1.7;
-  text-align: left;
-
-  /* [수정]
-    이 속성이 파이썬 코드의 공백과 줄바꿈을
-    그대로 렌더링하게 만듭니다.
-  */
-  white-space: pre-wrap;
-}
-
-/* --- 7. (신규) 결과 페이지 (Request 3.2 디자인) --- */
+/* --- 8. 결과 페이지 --- */
 .result-page {
   width: 100%;
-  min-height: 100vh;
-  /* [수정] 피그마의 그라데이션 배경 적용 */
   background: linear-gradient(180deg, white 70%, #24cde0 100%);
-
-  padding-top: 62px; /* 헤더(62px) 고려 */
-  padding-bottom: 120px; /* 하단 '다시하기' 버튼(약 100px) 고려 */
-
-  box-sizing: border-box;
+  padding-top: calc(62px + env(safe-area-inset-top));
+  padding-bottom: calc(120px + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-/* --- [신규] 결과 메인 이미지 --- */
+/* 결과 메인 이미지 */
 .result-main-image {
   width: 90%;
   max-width: 400px;
   height: auto;
   margin-top: 30px;
-  border: 1px solid rgba(0, 0, 0, 0.54); /* 피그마 코드 */
+  border: 1px solid rgba(0, 0, 0, 0.54);
 }
 
-/* --- 유형 소개 섹션 (Request 3.2 디자인) --- */
+/* 유형 소개 섹션 (중복 제거 버전) */
 .type-description {
   width: 90%;
   max-width: 400px;
@@ -454,16 +341,13 @@ html {
   text-align: center;
   background: white;
   padding: 20px;
-  /* [수정] 님의 요청에 따라 둥근 모서리 제거 */
   border-radius: 0;
-  /* [수정] 님의 요청에 따라 그림자 제거 */
   box-shadow: none;
   box-sizing: border-box;
 }
 .type-description h3 {
-  /* 피그마 스타일 적용 */
   color: black;
-  font-size: 18px;
+  font-size: 20px;
   font-family: "Pretendard";
   font-weight: 700;
   margin-top: 0;
@@ -471,19 +355,16 @@ html {
   text-align: left;
 }
 .type-description p {
-  /* 피그마 스타일 적용 */
   color: black;
-  font-size: 15px;
+  font-size: 17px;
   font-family: "Pretendard";
   font-weight: 500;
   line-height: 1.7;
   text-align: left;
-
-  /* [핵심] 들여쓰기(공백)와 줄바꿈을 코드 그대로 렌더링 */
   white-space: pre-wrap;
 }
 
-/* --- 공유하기 섹션 (Request 3.2 디자인) --- */
+/* 공유하기 섹션 */
 .share-section {
   width: 90%;
   max-width: 400px;
@@ -491,9 +372,8 @@ html {
   text-align: center;
 }
 .share-section h3 {
-  /* 피그마 스타일 적용 */
   color: black;
-  font-size: 18px;
+  font-size: 16px;
   font-family: "DungGeunMo";
   font-weight: 400;
   margin-bottom: 20px;
@@ -504,26 +384,24 @@ html {
   gap: 30px;
 }
 .share-buttons a img {
-  width: 60px; /* 아이콘 크기 */
-  height: 60px;
+  width: 50px;
+  height: 50px;
   transition: transform 0.2s;
 }
 .share-buttons a:hover img {
   transform: scale(1.1);
 }
 
-/* --- [신규] 다시하기 버튼 컨테이너 (fixed -> normal) --- */
+/* 다시하기 버튼 컨테이너 */
 .restart-button-container {
-  /* position: fixed 등 모든 고정 속성 제거 */
   width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  /* 공유하기 섹션과의 간격 */
   margin-top: 60px;
 }
 
-/* --- 다시하기 버튼 (신규) --- */
+/* 다시하기 버튼 */
 .btn-restart {
   display: block;
   width: 271px;
@@ -542,7 +420,6 @@ html {
   align-items: center;
   transition: transform 0.1s ease;
 }
-
 .btn-restart:active {
   transform: scale(0.98);
 }
