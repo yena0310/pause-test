@@ -1,9 +1,13 @@
-/* --- 1. 둥근모꼴 폰트 불러오기 --- */
+/* --- 1. 폰트 불러오기 --- */
 /* (static/css/ 폴더에 폰트 파일이 있다고 가정) */
 @font-face {
   font-family: "DungGeunMo";
   src: url("DungGeunMo.ttf") format("ttf");
   font-weight: 400;
+}
+@font-face {
+  font-family: "pretendard";
+  src: url("PretendardVariable.ttf") format("ttf");
 }
 
 /* --- 2. 기본 스타일 (리셋) --- */
@@ -44,11 +48,6 @@ html {
 }
 
 /* --- 3. 시작 페이지 (start-page) - 수정됨 --- */
-
-/* .container의 기본 스타일은 그대로 둡니다.
-  (max-width: 464px, margin: 0 auto 등)
-  우리는 .container 안의 .start-page를 꾸밀 것입니다.
-*/
 
 .start-page {
   width: 100%;
@@ -153,42 +152,203 @@ html {
 
 /* 시작 버튼 스타일 (피그마 Inner Shadow 적용) */
 .btn-start {
-    /* [수정] 피그마 디자인 값으로 변경 */
-    display: block;
-    
-    /* [수정] 피그마의 고정 너비/높이 적용 */
-    width: 324px;
-    height: 61px;
-    box-sizing: border-box; /* 패딩, 보더가 크기에 포함되도록 */
+  /* [수정] 피그마 디자인 값으로 변경 */
+  display: block;
 
-    background: #F8F8F8; /* 버튼 배경색 */
-    color: black; /* 글자 색 */
-    font-family: "DungGeunMo";
-    font-size: 22px;
-    font-weight: 400;
-    text-decoration: none;
-    
-    border-radius: 20px;
+  /* [수정] 피그마의 고정 너비/높이 적용 */
+  width: 324px;
+  height: 61px;
+  box-sizing: border-box; /* 패딩, 보더가 크기에 포함되도록 */
 
-    /* [핵심] shadow */
-    box-shadow: inset 0px -5px 12px rgba(0, 0, 0, 0.25);
+  background: #f8f8f8; /* 버튼 배경색 */
+  color: black; /* 글자 색 */
+  font-family: "DungGeunMo";
+  font-size: 22px;
+  font-weight: 400;
+  text-decoration: none;
 
-    /* 텍스트("시작하기")를 버튼의 세로/가로 중앙에 정렬합니다. */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    
-    /* (선택) 클릭 시 미세한 효과 */
-    transition: transform 0.1s ease;
+  border-radius: 20px;
+
+  /* [핵심] shadow */
+  box-shadow: inset 0px -5px 12px rgba(0, 0, 0, 0.25);
+
+  /* 텍스트("시작하기")를 버튼의 세로/가로 중앙에 정렬합니다. */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  /* (선택) 클릭 시 미세한 효과 */
+  transition: transform 0.1s ease;
 }
 
 .btn-start:active {
-    /* 버튼을 누르고 있을 때 살짝 작아지는 효과 */
-    transform: scale(0.98);
+  /* 버튼을 누르고 있을 때 살짝 작아지는 효과 */
+  transform: scale(0.98);
 }
 
-/*
-  [수정] 기존 .start-page .btn-start 스타일은
-  .fixed-button-container .btn-start 로 변경하거나
-  위의 스타일로 덮어써야 합니다.
-*/
+/* --- 4. 공통 페이지 헤더 (수정) --- */
+/* 피그마 디자인 적용: background: #7C7C7C, height: 62px */
+.page-header {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 464px;
+
+  /* [수정] 피그마 값 */
+  height: 62px;
+  background-color: #7c7c7c;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 15px;
+  box-sizing: border-box;
+  z-index: 10;
+}
+
+/* [수정] 뒤로가기 링크(<a>) 스타일 */
+.page-header .back-link {
+  position: absolute;
+  left: 20px; /* 왼쪽 여백 */
+  top: 50%;
+  transform: translateY(-50%);
+
+  /* (중요) 이미지 크기를 여기서 제어합니다 */
+  width: 12px; /* 피그마의 9.5px 보다 조금 여유있게 */
+  height: 22px; /* 피그마의 19px 보다 조금 여유있게 */
+
+  /* SVG가 늘어나지 않게 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* [신규] 뒤로가기 SVG 이미지(<img>) 스타일 */
+.page-header .back-link img {
+  width: 100%;
+  height: 100%;
+}
+
+/* [수정] 로고 이미지(<img>) 스타일 */
+.page-header .logo-img {
+  /* 텍스트 로고(.logo) 대신 이미지(.logo-img) 사용 */
+  height: 25px; /* 로고 이미지의 높이 (비율에 맞게 조절) */
+  width: auto; /* 너비는 비율에 맞게 자동 조절 */
+}
+
+/* --- 5. (신규) 질문 페이지 --- */
+.question-page {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  /* [수정] 피그마 그라데이션 적용 */
+  background: linear-gradient(180deg, white 37%, #24cde0 100%);
+
+  /* 상단 헤더(62px) 뒤에서 시작 + 추가 여백 */
+  padding-top: 80px;
+  padding-bottom: 40px;
+  padding-left: 20px;
+  padding-right: 20px;
+  box-sizing: border-box;
+}
+
+/* --- (신규) 진행 상황 바 --- */
+.progress-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 7px; /* 피그마 값 */
+  margin-top: 20px; /* 헤더와의 간격 */
+  margin-bottom: 40px; /* 질문과의 간격 */
+}
+
+.progress-dot {
+  /* [핵심] * 버블 사용  */
+  width: 20px;
+  height: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* --- 질문 텍스트 --- */
+.question-text {
+  color: black;
+  font-size: 22px;
+  font-family: "Pretendard";
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 40px;
+  line-height: 1.5; /* 줄 간격 */
+
+  /* [수정] 
+    - 3줄일 때의 높이(22px * 1.5 * 3 = 99px)를 최소 높이로 고정합니다.
+    - 2줄짜리 텍스트도 이 99px 공간 안에서 세로 중앙에 정렬됩니다.
+  */
+  min-height: 99px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- (신규) 답변 버튼 컨테이너 --- */
+.options-container {
+  width: 100%;
+  max-width: 320px; /* 피그마 버튼 너비(301px) + 여유 */
+}
+
+/* --- (수정) 답변 버튼 (Request 1) --- */
+.btn-option {
+  display: block;
+  width: 100%;
+  margin-bottom: 15px;
+  background: white;
+  border-radius: 18px;
+  box-shadow: inset -1px -3px 17px rgba(0, 0, 0, 0.31);
+  color: black;
+  font-size: 16px;
+  font-family: "Pretendard";
+  font-weight: 500;
+  text-align: center;
+  text-decoration: none;
+  line-height: 1.5;
+  box-sizing: border-box;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  /* [수정] Request 1: 버튼 크기 고정  */
+  padding: 20px; /* 좌우 패딩은 유지 */
+  min-height: 115px; /* (3줄 텍스트가 들어갈 수 있는 최소 높이. 픽셀 값 조절 필요) */
+  display: flex; /* Flexbox로 변경 */
+  justify-content: center; /* 가로 중앙 */
+  align-items: center; /* 세로 중앙 */
+}
+
+.btn-option:hover {
+  transform: scale(1.03); /* 살짝 커지는 효과 */
+}
+
+/* --- 6. (신규) 로딩 페이지 --- */
+.loading-page {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* 세로 중앙 정렬 */
+  background: linear-gradient(180deg, white 37%, #24cde0 100%);
+  padding-top: 62px;
+  box-sizing: border-box;
+}
+.loading-content {
+  text-align: center;
+}
+.loading-content p {
+  font-family: "DungGeunMo"; /* 둥근모꼴 적용 */
+  font-size: 1.5em;
+  color: #333;
+}

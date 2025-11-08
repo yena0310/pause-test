@@ -1,0 +1,75 @@
+{% extends "layout.html" %} {% block content %}
+<header class="page-header">
+  
+  <!-- 
+    [수정] Request 3.1: 뒤로가기 버튼 로직
+    - 1번 질문(q_id == 1)일 때는 첫 화면(index)으로
+    - 2번 이상일 때는 이전 질문(q_id - 1)으로
+  -->
+  {% if current_q_id > 1 %}
+  <!-- 2번 이상 질문: 이전 질문으로 (q_id - 1) -->
+  <a href="{{ url_for('question', q_id=current_q_id - 1) }}" class="back-link">
+    <img
+      src="{{ url_for('static', filename='images/back-arrow.svg') }}"
+      alt="뒤로가기"
+    />
+  </a>
+  {% else %}
+  <!-- 1번 질문: 첫 화면(index)으로 -->
+  <a href="{{ url_for('index') }}" class="back-link">
+    <img
+      src="{{ url_for('static', filename='images/back-arrow.svg') }}"
+      alt="뒤로가기"
+    />
+  </a>
+  {% endif %}
+
+  <img
+    src="{{ url_for('static', filename='images/logo.png') }}"
+    alt="Pause"
+    class="logo-img"
+  />
+</header>
+
+<main class="question-page">
+  <!-- 
+    [수정] Request 2: 진행 상황 바
+  -->
+  <div class="progress-bar">
+    {% for i in range(1, total_questions + 1) %}
+    <div class="progress-dot">
+      <!-- 
+        - i (1~9)가 현재 질문 번호(current_q_id)보다 '작거나 같으면' 활성 버블(ybubble.svg)
+        - '크면' 비활성 버블(gbubble.svg)
+        - (static/images/ 폴더에 ybubble.svg와 gbubble.svg 파일이 있어야 함)
+      -->
+      {% if i <= current_q_id %}
+      <img src="{{ url_for('static', filename='images/ybubble.svg') }}" alt="활성">
+      {% else %}
+      <img src="{{ url_for('static', filename='images/gbubble.svg') }}" alt="비활성">
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+
+  <h2 class="question-text">
+    {{ question.text | replace('\n', '<br />') | safe }}
+  </h2>
+
+  <div class="options-container">
+    {% for option in question.options %}
+    <!-- 
+      [신규] Request 3:
+      - app.py에서 'selected_option_index'를 받아옴
+      - 현재 버튼의 인덱스(loop.index0)와 일치하면 'selected' 클래스 추가
+    -->
+    <a
+      href="{{ url_for('answer', q_id=question.id, option_index=loop.index0) }}"
+      class="btn-option {% if loop.index0 == selected_option_index %}selected{% endif %}"
+    >
+      {{ option.text | replace('\n', '<br />') | safe }}
+    </a>
+    {% endfor %}
+  </div>
+</main>
+{% endblock %}
