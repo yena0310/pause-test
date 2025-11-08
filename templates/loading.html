@@ -1,0 +1,24 @@
+{% extends "layout.html" %} {% block content %}
+<!-- 
+  (수정) 헤더 부분을 이미지로 교체
+-->
+<header class="page-header">
+  <img
+    src="{{ url_for('static', filename='images/logo.png') }}"
+    alt="Pause"
+    class="logo-img"
+  />
+</header>
+
+<main class="loading-page">
+  <div class="loading-content">
+    <p>결과지를 생성 중입니다 ^.^</p>
+  </div>
+</main>
+
+<script>
+  setTimeout(function () {
+    window.location.href = "{{ url_for('calculate_result') }}";
+  }, 1500); // 1.5초
+</script>
+{% endblock %}
