@@ -1,25 +1,50 @@
 from flask import Flask, render_template, redirect, url_for, session, request
-import sqlite3
+from flask_sqlalchemy import SQLAlchemy
+import os # Render의 환경 변수를 읽기 위해 import
 
 app = Flask(__name__)
 app.secret_key = 'pause-test-secret-key' 
-DATABASE = 'data.db' 
 
-# --- (신규) DB 초기화 함수 ---
+# --- [대규모 수정] SQLAlchemy 설정 ---
+# 1. Render에서 제공하는 PostgreSQL 주소(DATABASE_URL)를 사용합니다.
+# 2. 만약 그 주소가 없으면(즉, 님의 Mac에서 로컬로 실행하면), 
+#    임시로 'sqlite:///local_test.db' 파일을 사용합니다.
+db_url = os.environ.get('DATABASE_URL')
+if db_url and db_url.startswith("postgres://"):
+    # Render가 제공하는 주소 형식을 SQLAlchemy에 맞게 수정
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
+else:
+    # 로컬 테스트용 임시 DB
+    db_url = 'sqlite:///local_test.db'
+
+app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False # 경고 메시지 제거
+
+db = SQLAlchemy(app) # DB 객체 초기화
+
+# --- [신규] DB 모델(테이블) 정의 ---
+# 기존의 'counts' 테이블을 파이썬 클래스로 정의
+class Counts(db.Model):
+    # 'type' 컬럼 (예: 'ghost', 'dopamine', 'total')
+    type = db.Column(db.String(50), primary_key=True)
+    # 'count' 컬럼
+    count = db.Column(db.Integer, default=0)
+
+# --- (신규) DB 테이블 생성 및 초기값 설정 함수 ---
 def init_db():
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS counts (
-            type TEXT PRIMARY KEY,
-            count INTEGER NOT NULL DEFAULT 0
-        )
-    ''')
-    types = ['ghost', 'dopamine', 'soloplayer', 'humanlatte', 'muscler', 'hotnevi', 'total']
-    for t in types:
-        c.execute("INSERT OR IGNORE INTO counts (type, count) VALUES (?, 0)", (t,))
-    conn.commit()
-    conn.close()
+    with app.app_context():
+        db.create_all() # Counts 테이블이 없으면 생성
+        
+        # 6가지 유형 + 'total'이 DB에 없으면, 초기값 0으로 생성
+        types = ['ghost', 'dopamine', 'soloplayer', 'humanlatte', 'muscler', 'hotnevi', 'total']
+        for t in types:
+            # .get()은 primary_key로 데이터를 조회
+            existing = db.session.get(Counts, t) 
+            if not existing:
+                new_count = Counts(type=t, count=0)
+                db.session.add(new_count)
+        
+        db.session.commit() # DB에 최종 저장
 
 result_data = {
     'ghost': {
@@ -242,15 +267,19 @@ def calculate_result():
         key = place_key + activity_key + digital_key
         final_type_name = type_map_by_key.get(key, 'ghost') 
     
+    # --- [대규모 수정] DB 저장 로직 (SQLAlchemy) ---
     try:
-        conn = sqlite3.connect(DATABASE)
-        c = conn.cursor()
-        c.execute("UPDATE counts SET count = count + 1 WHERE type = ?", (final_type_name,))
-        c.execute("UPDATE counts SET count = count + 1 WHERE type = 'total'")
-        conn.commit()
-        conn.close()
+        # .get()을 사용해 primary_key로 객체를 조회
+        type_to_update = db.session.get(Counts, final_type_name)
+        total_to_update = db.session.get(Counts, 'total')
+        
+        if type_to_update and total_to_update:
+            type_to_update.count += 1
+            total_to_update.count += 1
+            db.session.commit() # 변경사항 저장
     except Exception as e:
-        print(f"DB Error: {e}") 
+        print(f"DB Error: {e}")
+        db.session.rollback() # 오류 발생 시 롤백
 
     return redirect(url_for('result', type_name=final_type_name))
 
@@ -262,25 +291,26 @@ def result(type_name):
     
     data = result_data[type_name]
     
+    # --- [대규모 수정] DB 읽기 로직 (SQLAlchemy) ---
     total_count = 1
     type_count = 1
     try:
-        conn = sqlite3.connect(DATABASE)
-        c = conn.cursor()
-        c.execute("SELECT count FROM counts WHERE type = 'total'")
-        total_count = c.fetchone()[0]
-        c.execute("SELECT count FROM counts WHERE type = ?", (type_name,))
-        type_count = c.fetchone()[0]
-        conn.close()
-    except Exception:
-        pass
+        total_count_obj = db.session.get(Counts, 'total')
+        type_count_obj = db.session.get(Counts, type_name)
+        
+        if total_count_obj:
+            total_count = total_count_obj.count
+        if type_count_obj:
+            type_count = type_count_obj.count
+            
+    except Exception as e:
+        print(f"DB Read Error: {e}")
+        pass # DB 오류 시에도 결과 페이지는 보여줌
     
     type_percent = "0.0%"
     if total_count > 0:
          type_percent = f"{(type_count / total_count * 100):.1f}%"
     
-    # result.html이 없는 경우를 대비해 임시로 index.html 렌더링
-    # (실제로는 Step 3에서 만든 result.html이 있어야 함)
     try:
         return render_template('result.html', 
                             data=data,
@@ -290,5 +320,6 @@ def result(type_name):
          return f"Result: {type_name}, Description: {data['description']}"
 
 if __name__ == '__main__':
-    # init_db() 
+    # (신규) 앱 실행 전 DB 테이블 생성 및 초기값 설정
+    init_db() 
     app.run(debug=True)
