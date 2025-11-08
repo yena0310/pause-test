@@ -3,7 +3,13 @@
 {% block content %}
 <!-- ... (헤더 부분은 동일) ... -->
 <header class="page-header">
-    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Pause" class="logo-img">
+  <a href="{{ url_for('index') }}" class="logo-link">
+    <img
+      src="{{ url_for('static', filename='images/logo.png') }}"
+      alt="Pause"
+      class="logo-img"
+    />
+  </a>
 </header>
 
 <main class="result-page">

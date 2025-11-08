@@ -1,6 +1,5 @@
 {% extends "layout.html" %} {% block content %}
 <header class="page-header">
-  
   <!-- 
     [수정] Request 3.1: 뒤로가기 버튼 로직
     - 1번 질문(q_id == 1)일 때는 첫 화면(index)으로
@@ -24,11 +23,13 @@
   </a>
   {% endif %}
 
-  <img
-    src="{{ url_for('static', filename='images/logo.png') }}"
-    alt="Pause"
-    class="logo-img"
-  />
+  <a href="{{ url_for('index') }}" class="logo-link">
+    <img
+      src="{{ url_for('static', filename='images/logo.png') }}"
+      alt="Pause"
+      class="logo-img"
+    />
+  </a>
 </header>
 
 <main class="question-page">
@@ -44,9 +45,15 @@
         - (static/images/ 폴더에 ybubble.svg와 gbubble.svg 파일이 있어야 함)
       -->
       {% if i <= current_q_id %}
-      <img src="{{ url_for('static', filename='images/ybubble.svg') }}" alt="활성">
+      <img
+        src="{{ url_for('static', filename='images/ybubble.svg') }}"
+        alt="활성"
+      />
       {% else %}
-      <img src="{{ url_for('static', filename='images/gbubble.svg') }}" alt="비활성">
+      <img
+        src="{{ url_for('static', filename='images/gbubble.svg') }}"
+        alt="비활성"
+      />
       {% endif %}
     </div>
     {% endfor %}
