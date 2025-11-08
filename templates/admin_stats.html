@@ -1,0 +1,70 @@
+{% extends "layout.html" %} 
+{% block content %}
+<style>
+  /* 보기 편하도록 간단한 스타일 추가 */
+  .stats-container {
+    padding: 30px;
+    max-width: 600px;
+    margin: 20px auto;
+    background: #f9f9f9;
+    border-radius: 10px;
+  }
+  .stats-container h1 {
+    text-align: center;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 15px;
+  }
+  .stats-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.2rem;
+    padding: 12px 5px;
+    border-bottom: 1px solid #eee;
+  }
+  .stats-item strong {
+    color: #333;
+  }
+  .stats-total {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px solid #333;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #000;
+  }
+</style>
+
+<header class="page-header">
+  <a href="{{ url_for('index') }}" class="back-link">
+    <img
+      src="{{ url_for('static', filename='images/back-arrow.svg') }}"
+      alt="뒤로가기"
+    />
+  </a>
+  <img
+    src="{{ url_for('static', filename='images/logo.png') }}"
+    alt="Pause"
+    class="logo-img"
+  />
+</header>
+
+<main>
+  <div class="stats-container">
+    <h1>📊 전체 통계</h1>
+
+    {% for item in type_stats %}
+    <div class="stats-item">
+      <span>{{ item.type }}</span>
+      <strong>{{ item.count }} 명</strong>
+    </div>
+    {% endfor %}
+
+    {% if total_stat %}
+    <div class="stats-item stats-total">
+      <span>총 참여자</span>
+      <strong>{{ total_stat.count }} 명</strong>
+    </div>
+    {% endif %}
+  </div>
+</main>
+{% endblock %}

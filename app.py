@@ -319,6 +319,39 @@ def result(type_name):
     except:
          return f"Result: {type_name}, Description: {data['description']}"
 
+@app.route('/admin-stats')
+def admin_stats():
+    """
+    (수정) 모든 통계 데이터를 보여주는 관리자용 페이지 (비밀번호 추가)
+    """
+    # --- [신규] 간단한 비밀번호 확인 ---
+    # Render 환경 변수에 설정한 'ADMIN_PASSWORD'를 가져옵니다.
+    ADMIN_PW = os.environ.get('ADMIN_PASSWORD', '0000')
+    
+    # URL 쿼리 파라미터(?pw=...)로 전달된 값을 확인
+    input_pw = request.args.get('pw')
+    
+    if input_pw != ADMIN_PW:
+        # 비밀번호가 틀리거나 없으면 403 (Forbidden) 오류를 반환
+        return "<h1>Access Denied</h1><p>접근 권한이 없습니다.</p>", 403
+
+    try:
+        # DB에서 'total'을 제외한 유형 데이터를 가져옴 (알파벳 순)
+        type_stats = db.session.scalars(
+            db.select(Counts).filter(Counts.type != 'total').order_by(Counts.type)
+        ).all()
+        
+        # 'total' 데이터만 따로 가져옴
+        total_stat = db.session.get(Counts, 'total')
+        
+    except Exception as e:
+        print(f"Admin Stats DB Error: {e}")
+        return "데이터를 불러오는 중 오류가 발생했습니다."
+
+    return render_template('admin_stats.html', 
+                           type_stats=type_stats, 
+                           total_stat=total_stat)
+
 if __name__ == '__main__':
     # (신규) 앱 실행 전 DB 테이블 생성 및 초기값 설정
     init_db() 
