@@ -1,11 +1,84 @@
 from flask import Flask, render_template, redirect, url_for, session, request
+import sqlite3
 
 app = Flask(__name__)
-# 세션(session) 기능을 사용하기 위해 시크릿 키가 반드시 필요합니다.
 app.secret_key = 'pause-test-secret-key' 
+DATABASE = 'data.db' 
 
-# --- 질문 9개 데이터 ---
-# (중요: 6가지 유형 'dopamine', 'ghost', 'hotnevi', 'humanlatte', 'muscler', 'soloplayer'로 type을 맞춰주세요)
+# --- (신규) DB 초기화 함수 ---
+def init_db():
+    conn = sqlite3.connect(DATABASE)
+    c = conn.cursor()
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS counts (
+            type TEXT PRIMARY KEY,
+            count INTEGER NOT NULL DEFAULT 0
+        )
+    ''')
+    types = ['ghost', 'dopamine', 'soloplayer', 'humanlatte', 'muscler', 'hotnevi', 'total']
+    for t in types:
+        c.execute("INSERT OR IGNORE INTO counts (type, count) VALUES (?, 0)", (t,))
+    conn.commit()
+    conn.close()
+
+result_data = {
+    'ghost': {
+        'image': 'ghost.jpg', 
+        'description': """당신은 ‘완전한 고요함’을 통해 회복하는 사람!\n
+사람 사이의 소음, 쏟아지는 메시지로부터\n잠시 멀어져야 나에게 집중할 수 있습니다.\n
+이 유형은 고요함의 안정과 내면의 잔잔함을\n가장 소중하게 여깁니다.\n
+그래서 종종 ‘잠수했다’는 오해를 받기도 하지만,\n그 시간은 다시 일어설 힘을 얻는\n리셋의 시간입니다.\n
+당신에게 쉼은 고요한 방, 조용한 핸드폰,\n그리고 나 자신입니다.\n
+아무것도 하지 않아도 괜찮아요.\n그 자체로 이미 충분히 ‘쉬고’ 있으니까요."""
+    },
+    'dopamine': {
+        'image': 'dopamine.jpg',
+        'description': """당신은 ‘디지털 콘텐츠’를 통해 회복하는 사람!\n
+온라인 세상에서 얻을 수 있는 도파민이\n에너지가 됩니다.\n
+유튜브, 넷플릭스, SNS 속에서 수많은 콘텐츠와\n밈을 섭렵하며 모르는 게 없을 정도입니다.\n
+이 유형은 도파민 터지는 미디어와 유행을\n가장 소중하게 여깁니다.\n
+휴식 시간이 생기면 집에서 밀린 드라마와 영화를\n정주행하며 혼자만의 시간을 즐기곤 합니다.\n
+그래도 종종 창밖을 바라보거나 일어나서\n스트레칭하는 시간이 필요합니다."""
+    },
+    'soloplayer': {
+        'image': 'soloplayer.jpg',
+        'description': """당신은 ‘나만의 취미’를 통해 회복하는 사람!\n
+혼자 있는 시간이 외롭지 않고,\n오히려 가장 만족스러운 순간입니다.\n
+이 유형은 손으로 무언가를 만들고,\n나만의 흐름에 몰입할 때 에너지를 얻습니다.\n
+책을 읽고, 요리하고, 그림을 그리고, 악기를 연주하며,\n세상과의 연결보다 나만의 창조적인 시간을\n더 소중히 여깁니다.\n
+당신에게 쉼은 좋아하는 취미,\n그리고 집중의 순간입니다.\n
+나만의 색깔로 채운 시간이\n당신을 회복하게 합니다. 🎨✨"""
+    },
+    'humanlatte': {
+        'image': 'humanlatte.jpg',
+        'description': """당신은 ‘따듯한 관계’를 통해 회복하는 사람!\n
+혼자 있는 시간도 좋지만,\n당신의 쉼은 사람 사이의 소통에서 옵니다.\n
+이 유형은 대단한 활동보다, 서로의 존재만으로\n편안한 순간을 가장 소중히 여깁니다.\n
+카페 창가에 앉아 친구와 이야기를 나누고,\n함께하는 웃음과 공감으로 에너지를 얻습니다.\n
+당신에게 쉼은 따뜻한 분위기, 편안한 대화,\n그리고 함께 있는 시간입니다.\n
+조용하지만 깊은 정서적 유대가\n당신을 회복하게 합니다."""
+    },
+    'muscler': {
+        'image': 'muscler.jpg',
+        'description': """당신은 ‘사람과의 에너지 교류’를 통해 회복하는 사람!\n
+움직일수록, 웃을수록, 함께할수록\n에너지가 차오릅니다.\n
+이 유형은 사람들과 몸으로 부딪치며\n생생한 현장감 속에서 스트레스를 해소합니다.\n
+보드게임과 방탈출을 즐기고, 스포츠를 통한\n경쟁과 협동에서 진짜 즐거움을 느낍니다.\n
+당신에게 쉼은 함께 웃고 뛰는 시간, 팀워크의 쾌감,\n그리고 지속적인 유대감입니다.\n
+사람 사이의 활력은\n당신을 더 강하고 생기 있게 만듭니다. 🔥"""
+    },
+    'hotnevi': {
+        'image': 'hotnevi.jpg',
+        'description': """당신은 ‘새로운 경험’을 통해 회복하는 사람!\n
+세상의 흥미로운 곳을 찾아 나서는 것이\n곧 당신의 휴식입니다.\n
+이 유형은 사람들과 어울리고, 그 순간을\n기록하고 공유하며 에너지를 얻는 타입입니다.\n
+요즘 뜨는 맛집, 전시회, 축제, 여행지\n어디든 당신의 발길이 닿습니다.\n
+즐거운 순간을 사진과 영상으로 남기며,\n세상과 활발하게 소통합니다.\n
+당신에게 쉼은 새로운 장소와 추억,\n함께 웃는 사람들입니다.\n
+나만의 장소가 넓혀질수록,\n당신을 더 생기있게 만듭니다. ✨📸"""
+    }
+}
+
 questions = [
     { # 1
         'id': 1,
@@ -81,91 +154,141 @@ questions = [
     }
 ]
 
-
 @app.route('/')
 def index():
-    # --- (수정) Request 3: 'scores' 대신 'answers'를 초기화 ---
-    # 사용자가 각 질문(q_id)에 몇 번째(option_index)를 답했는지 저장
     session['answers'] = {} 
     return render_template('index.html')
 
-
-# <int:q_id>는 URL의 숫자를 q_id라는 정수 변수로 받겠다는 의미
 @app.route('/question/<int:q_id>')
 def question(q_id):
     if q_id < 1 or q_id > len(questions):
         return redirect(url_for('index'))
     current_question = questions[q_id - 1]
-    
-    # --- (신규) Request 3: 이전에 선택한 답변이 있다면 템플릿에 전달 ---
     user_answers = session.get('answers', {})
-    selected_option_index = user_answers.get(str(q_id)) # q_id를 문자열 키로 사용
+    selected_option_index = user_answers.get(str(q_id))
     
-    # question.html 템플릿에 '질문 데이터'와 '현재 질문 번호'를 전달
     return render_template('question.html', question=current_question, 
-                           current_q_id=q_id, total_questions=len(questions))
+                           current_q_id=q_id, total_questions=len(questions),
+                           selected_option_index=selected_option_index)
 
-
-# --- (수정) Request 3: 답변 저장 로직 변경 ---
 @app.route('/answer/<int:q_id>/<int:option_index>')
 def answer(q_id, option_index):
-  # 1. 유효한 질문/답변인지 확인
   try:
       _ = questions[q_id - 1]['options'][option_index]
   except IndexError:
       return redirect(url_for('index'))
   
-  # 2. (수정) 점수를 누적하는 대신, '답변'을 세션에 기록
   if 'answers' in session:
       answers = session['answers'].copy()
-      # 키를 문자열로 저장 (JSON 호환)
-      answers[str(q_id)] = option_index # 예: {'1': 0, '2': 1, ...}
+      answers[str(q_id)] = option_index 
       session['answers'] = answers
   
-  # 3. 다음 질문으로 이동
   next_q_id = q_id + 1
   if next_q_id > len(questions):
       return redirect(url_for('loading'))
   else:
       return redirect(url_for('question', q_id=next_q_id))
 
-# --- (신규) 로딩 페이지 (Step 3에서 추가) ---
 @app.route('/loading')
 def loading():
-    # (주의: loading.html 파일이 templates 폴더에 있어야 함)
-    return render_template('loading.html')
+    try:
+        return render_template('loading.html')
+    except:
+        return redirect(url_for('calculate_result'))
 
-# --- (수정) Request 3: 결과 계산 로직 변경 ---
+
 @app.route('/calculate_result')
 def calculate_result():
     if 'answers' not in session or len(session['answers']) < len(questions):
-        # 모든 질문에 답하지 않았으면 첫 페이지로
         return redirect(url_for('index'))
         
-    user_answers = session['answers'] # 예: {'1': 0, '2': 1, ...}
+    user_answers = session['answers']
     
-    # --- (신규) Request 3: 저장된 답변을 기반으로 최종 점수 계산 ---
     final_scores = {'in': 0, 'out': 0, 'static': 0, 'dynamic': 0, 'online': 0, 'offline': 0}
     
-    # 모든 질문(1~9)을 순회
     for q_id_str, option_index in user_answers.items():
         q_id = int(q_id_str)
-        # 해당 질문/답변의 태그를 가져옴
         try:
             tags = questions[q_id - 1]['options'][option_index].get('tags', [])
             for tag in tags:
                 if tag in final_scores:
                     final_scores[tag] += 1
         except IndexError:
-            continue # (혹시 모를 오류 방지)
+            continue
     
-    scores = final_scores # (이름만 변경)
+    scores = final_scores
+    
+    type_map_by_key = {
+        'AAA': 'ghost', 'AAB': 'dopamine', 'ABA': 'soloplayer', 
+        'BAA': 'humanlatte', 'BBA': 'muscler', 'BBB': 'hotnevi'
+    }
 
-    key_map = { 'in': 'A', 'out': 'B', 'static': 'A', 'dynamic': 'B', 'offline': 'A', 'online': 'B' }
+    place_key = 'A' if scores['in'] >= scores['out'] else 'B'
+    activity_key = 'A' if scores['static'] >= scores['dynamic'] else 'B'
+    digital_key = 'A' if scores['offline'] >= scores['online'] else 'B'
+    
+    key = place_key + activity_key + digital_key
+    final_type_name = type_map_by_key.get(key)
+    
+    if final_type_name is None:
+        dynamic_score = scores['dynamic']
+        online_score = scores['online']
+        
+        if dynamic_score >= online_score:
+            digital_key = 'A'
+        else:
+            digital_key = 'B'
+            
+        key = place_key + activity_key + digital_key
+        final_type_name = type_map_by_key.get(key, 'ghost') 
+    
+    try:
+        conn = sqlite3.connect(DATABASE)
+        c = conn.cursor()
+        c.execute("UPDATE counts SET count = count + 1 WHERE type = ?", (final_type_name,))
+        c.execute("UPDATE counts SET count = count + 1 WHERE type = 'total'")
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        print(f"DB Error: {e}") 
 
-    # (지금은 임시 텍스트 출력)
-    return f"최종 점수: {scores}"
-    # (최종: return redirect(url_for('result', type_name='soloplayer')))
+    return redirect(url_for('result', type_name=final_type_name))
+
+
+@app.route('/result/<string:type_name>')
+def result(type_name):
+    if type_name not in result_data:
+        return redirect(url_for('index'))
+    
+    data = result_data[type_name]
+    
+    total_count = 1
+    type_count = 1
+    try:
+        conn = sqlite3.connect(DATABASE)
+        c = conn.cursor()
+        c.execute("SELECT count FROM counts WHERE type = 'total'")
+        total_count = c.fetchone()[0]
+        c.execute("SELECT count FROM counts WHERE type = ?", (type_name,))
+        type_count = c.fetchone()[0]
+        conn.close()
+    except Exception:
+        pass
+    
+    type_percent = "0.0%"
+    if total_count > 0:
+         type_percent = f"{(type_count / total_count * 100):.1f}%"
+    
+    # result.html이 없는 경우를 대비해 임시로 index.html 렌더링
+    # (실제로는 Step 3에서 만든 result.html이 있어야 함)
+    try:
+        return render_template('result.html', 
+                            data=data,
+                            total_count=total_count,
+                            type_percent=type_percent)
+    except:
+         return f"Result: {type_name}, Description: {data['description']}"
 
 if __name__ == '__main__':
-  app.run(debug=True)
+    # init_db() 
+    app.run(debug=True)
