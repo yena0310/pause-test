@@ -1,22 +1,29 @@
 from flask import Flask, render_template, redirect, url_for, session, request
 from flask_sqlalchemy import SQLAlchemy
 import os # Render의 환경 변수를 읽기 위해 import
+from pathlib import Path
 
 app = Flask(__name__)
 app.secret_key = 'pause-test-secret-key' 
 
-# --- [대규모 수정] SQLAlchemy 설정 ---
-db_url = os.environ.get('DATABASE_URL')
-if db_url and db_url.startswith("postgres://"):
-    # Render가 제공하는 주소 형식을 SQLAlchemy에 맞게 수정
-    db_url = db_url.replace("postgres://", "postgresql://", 1)
-else:
-    print("DB error. No database url")
+# 1) 환경변수 → Postgres 드라이버 보정 → SQLite 폴백
+db_url = os.environ.get("DATABASE_URL", "").strip()
+
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql+psycopg2://", 1)
+
+if not db_url:
+    # Render 무료 웹서비스의 에페메럴 디스크 영역 사용 (재시작시 유실 가능)
+    data_dir = Path("/var/tmp/data")
+    data_dir.mkdir(parents=True, exist_ok=True)
+    db_url = f"sqlite:///{data_dir}/app.db"
+    print(f"[INFO] DATABASE_URL not set. Using SQLite fallback at {db_url}")
+
+app.logger.info(f"Effective DB URL: {db_url}")
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False # 경고 메시지 제거
-
-db = SQLAlchemy(app) # DB 객체 초기화
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
 
 # --- [신규] DB 모델(테이블) 정의 ---
 # 기존의 'counts' 테이블을 파이썬 클래스로 정의
@@ -26,21 +33,21 @@ class Counts(db.Model):
     # 'count' 컬럼
     count = db.Column(db.Integer, default=0)
 
-# --- (신규) DB 테이블 생성 및 초기값 설정 함수 ---
 def init_db():
-    with app.app_context():
-        db.create_all() # Counts 테이블이 없으면 생성
-        
-        # 6가지 유형 + 'total'이 DB에 없으면, 초기값 0으로 생성
-        types = ['ghost', 'dopamine', 'soloplayer', 'humanlatte', 'muscler', 'hotnevi', 'total']
-        for t in types:
-            # .get()은 primary_key로 데이터를 조회
-            existing = db.session.get(Counts, t) 
-            if not existing:
-                new_count = Counts(type=t, count=0)
-                db.session.add(new_count)
-        
-        db.session.commit() # DB에 최종 저장
+    db.create_all()
+    types = ['ghost','dopamine','soloplayer','humanlatte','muscler','hotnevi','total']
+    for t in types:
+        if db.session.get(Counts, t) is None:
+            db.session.add(Counts(type=t, count=0))
+    db.session.commit()
+
+# 배포 환경에서도 반드시 실행되도록 훅 등록
+@app.before_first_request
+def _ensure_db():
+    try:
+        init_db()
+    except Exception as e:
+        print(f"[WARN] init_db failed: {e}")
 
 result_data = {
     'ghost': {
@@ -349,6 +356,5 @@ def admin_stats():
                            total_stat=total_stat)
 
 if __name__ == '__main__':
-    # (신규) 앱 실행 전 DB 테이블 생성 및 초기값 설정
     init_db() 
     app.run(debug=True)
