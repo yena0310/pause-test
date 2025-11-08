@@ -1,13 +1,42 @@
 /* --- 1. 폰트 불러오기 --- */
-/* (static/css/ 폴더에 폰트 파일이 있다고 가정) */
 @font-face {
-  font-family: "DungGeunMo";
-  src: url("DungGeunMo.ttf") format("ttf");
-  font-weight: 400;
+  font-family: "DungGeunMo"; /* 원본 폰트명과 일치시켰습니다 */
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/DungGeunMo.woff")
+    format("woff");
+  font-weight: normal; /* 400과 동일합니다 */
+  font-display: swap;
 }
+
 @font-face {
-  font-family: "pretendard";
-  src: url("PretendardVariable.ttf") format("ttf");
+  font-family: "Pretendard";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Regular.woff2")
+    format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Pretendard";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Medium.woff2")
+    format("woff2");
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Pretendard";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-SemiBold.woff2")
+    format("woff2");
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Pretendard";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Bold.woff2")
+    format("woff2");
+  font-weight: 700;
+  font-display: swap;
 }
 
 /* --- 2. 기본 스타일 (리셋) --- */

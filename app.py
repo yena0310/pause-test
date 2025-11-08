@@ -6,28 +6,23 @@ from pathlib import Path
 app = Flask(__name__)
 app.secret_key = 'pause-test-secret-key' 
 
-# 1) 환경변수 → Postgres 드라이버 보정 → SQLite 폴백
+# --- DB URL 결정(보정/폴백) ---
 db_url = os.environ.get("DATABASE_URL", "").strip()
-
 if db_url.startswith("postgres://"):
     db_url = db_url.replace("postgres://", "postgresql+psycopg2://", 1)
-
 if not db_url:
-    # Render 무료 웹서비스의 에페메럴 디스크 영역 사용 (재시작시 유실 가능)
-    data_dir = Path("/var/tmp/data")
-    data_dir.mkdir(parents=True, exist_ok=True)
+    data_dir = Path("/var/tmp/data"); data_dir.mkdir(parents=True, exist_ok=True)
     db_url = f"sqlite:///{data_dir}/app.db"
-    print(f"[INFO] DATABASE_URL not set. Using SQLite fallback at {db_url}")
-
+app.config["SQLALCHEMY_DATABASE_URI"] = db_url
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.logger.info(f"Effective DB URL: {db_url}")
 
-app.config['SQLALCHEMY_DATABASE_URI'] = db_url
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 # --- [신규] DB 모델(테이블) 정의 ---
 # 기존의 'counts' 테이블을 파이썬 클래스로 정의
 class Counts(db.Model):
+    __tablename__ = "counts"   # 추가 
     # 'type' 컬럼 (예: 'ghost', 'dopamine', 'total')
     type = db.Column(db.String(50), primary_key=True)
     # 'count' 컬럼
@@ -41,13 +36,13 @@ def init_db():
             db.session.add(Counts(type=t, count=0))
     db.session.commit()
 
-# 배포 환경에서도 반드시 실행되도록 훅 등록
-@app.before_first_request
-def _ensure_db():
-    try:
+# 임포트 즉시 한 번만 초기화
+try:
+    with app.app_context():
         init_db()
-    except Exception as e:
-        print(f"[WARN] init_db failed: {e}")
+        app.logger.info("init_db: create_all done")
+except Exception as e:
+    app.logger.warning(f"init_db failed: {e}")
 
 result_data = {
     'ghost': {
@@ -356,5 +351,7 @@ def admin_stats():
                            total_stat=total_stat)
 
 if __name__ == '__main__':
-    init_db() 
+    # 로컬 실행 시에도 컨텍스트에서 초기화
+    with app.app_context():
+        init_db()   # ← 필요하면 유지, 위에서 이미 했다면 이 줄은 생략 가능
     app.run(debug=True)
