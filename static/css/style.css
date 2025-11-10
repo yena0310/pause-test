@@ -333,6 +333,16 @@ body {
   border: 1px solid rgba(0, 0, 0, 0.54);
 }
 
+.save-img {
+  color: black;
+  font-size: 16px;
+  font-family: "Pretendard";
+  font-weight: 500;
+  line-height: 1.7;
+  text-align: left;
+  white-space: pre-wrap;
+}
+
 /* 유형 소개 섹션 (중복 제거 버전) */
 .type-description {
   width: 90%;
