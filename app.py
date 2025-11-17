@@ -180,11 +180,11 @@ questions = [
         "options": [
             {
                 "text": "나 자는 사이에 무슨 일 없었나…?\n핸드폰부터 켜고 세상 돌아가는 걸\n봐야 마음이 놓인다.",
-                "tags": ["static", "online"],
+                "tags": ["in", "online"],
             },
             {
                 "text": "창문 열고 햇살 확인!☀️️\n오늘은 나만의 속도로 시작한다.",
-                "tags": ["dynamic", "offline"],
+                "tags": ["out", "offline"],
             },
         ],
     },
@@ -198,7 +198,7 @@ questions = [
             },
             {
                 "text": "더 생각할수록 머리만 아프다.\n일단 몸을 움직이자!🏃🏻‍♀️",
-                "tags": ["dynamic", "offline"],
+                "tags": ["dynamic"],
             },
         ],
     },
@@ -208,7 +208,7 @@ questions = [
         "options": [
             {
                 "text": "오늘 일기에 적어놔야지…📝\n이 순간을 즐기며 기억 속에 남겨둔다.",
-                "tags": ["static"],
+                "tags": ["in", "static"],
             },
             {
                 "text": "바로 사진으로 남겨 인스타그램에 업로드!📸\n친구들에게 공유한다.",
@@ -222,11 +222,11 @@ questions = [
         "options": [
             {
                 "text": "카페에서 미뤄뒀던 책 읽기,\n낮잠 자기, 노래 들으면서 멍때리기.\n나의 조용한 시간을 아무도 방해할 수 없다.",
-                "tags": ["static"],
+                "tags": ["static", "offline"],
             },
             {
                 "text": "이 귀한 시간을 낭비할 수는 없지!✈️\n바로 여행을 떠나거나 산과 바다,\n미뤄뒀던 액티비티를 한다.",
-                "tags": ["dynamic"],
+                "tags": ["out", "dynamic"],
             },
         ],
     },
@@ -248,15 +248,15 @@ questions = [
 
 # --- 질문별 가중치 (튜닝된 알파값) ---
 QUESTION_WEIGHTS = [
-    0.265,  # Q1
-    0.232,  # Q2
-    0.439,  # Q3
-    2.127,  # Q4
-    0.125,  # Q5
-    2.327,  # Q6
-    2.785,  # Q7
-    1.042,  # Q8
-    0.537,  # Q9
+    1,  # Q1
+    1,  # Q2
+    1,  # Q3
+    1,  # Q4
+    1,  # Q5
+    1,  # Q6
+    1,  # Q7
+    1,  # Q8
+    1,  # Q9
 ]
 
 # --- 유형 방향 벡터 (연속형 알고리즘용) ---
@@ -401,12 +401,6 @@ def answer(q_id, option_index):
 
 @app.route("/loading")
 def loading():
-    """
-    기존에는 loading.html만 렌더링하고 정작 calculate_result로 넘어가지 않아
-    사용자가 페이지에 갇히는 문제가 있었음.
-    여기서는 바로 결과 계산으로 리디렉트.
-    (실제 로딩 애니메이션을 쓰고 싶다면 템플릿에서 meta/JS 리디렉트를 구현.)
-    """
     return render_template("loading.html")
 
 
